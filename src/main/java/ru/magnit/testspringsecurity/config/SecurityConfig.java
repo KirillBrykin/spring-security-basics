@@ -14,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import ru.magnit.testspringsecurity.model.Role;
 
-
+/**
+ * @Bean - добавляем для доступности метода, без него метод не будет работать
+ * */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -53,7 +55,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     //  @Bean - добавляем для доступности метода, без него метод не будет работать
-
     // Переопределяем метод что бы использовать InMemory users
     // и хранить пользвоателей в приложении.
     @Bean
