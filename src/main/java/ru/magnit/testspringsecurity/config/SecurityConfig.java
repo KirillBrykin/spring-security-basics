@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import ru.magnit.testspringsecurity.model.Permission;
 import ru.magnit.testspringsecurity.model.Role;
 
 // @Bean - добавляем для доступности метода, без него метод не будет работать
@@ -36,20 +37,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // страница будет доступна так же без аутентификации
                 .antMatchers("/").permitAll()
 
-                // Далее задаём доступ на урлы только по ролям.
-                // ** - любое что идёи после /api/ должен иметь доступ с определенными ролями.
+                // Далее задаём доступ на урлы только по полномочиям.
+                // ** - любое что идёт после /api/ должно иметь доступ с определенными полномочиями.
                 // antMatchers - имеет перегруженные метод и можно указать тип HttpMethod.
-                // hasAnyRole - указывает каким ролям будет доступны данные урлы
-                .antMatchers(HttpMethod.GET, API_URL).hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-
-                // на POST и DELETE доступ имеет только админ
-                // hasRole - принимает одну строку а hasAnyRole строку переменной длины
-                .antMatchers(HttpMethod.POST, API_URL).hasRole(Role.ADMIN.name())
-                .antMatchers(HttpMethod.DELETE, API_URL).hasRole(Role.ADMIN.name())
+                // hasAnyAuthority - указывает каким полномочиям будет доступны данные урлы
+                .antMatchers(HttpMethod.GET, API_URL).hasAnyAuthority(Permission.DEVELOPERS_READ.getPermission())
+                .antMatchers(HttpMethod.POST, API_URL).hasAnyAuthority(Permission.DEVELOPERS_WRITE.getPermission())
+                .antMatchers(HttpMethod.DELETE, API_URL).hasAnyAuthority(Permission.DEVELOPERS_WRITE.getPermission())
 
                 // далее каждый запрос (anyRequest) по урлам описанным выше (в данном примере "/api/**") должен быть
                 // аутентифицирован (authenticated) и использовать httpBasic для входа в приложение
-                .anyRequest().authenticated().and().httpBasic();
+                .anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic();
     }
 
     // Переопределяем метод что бы использовать InMemory users
@@ -61,14 +62,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails admin = User.builder()
                 .username("admin")
                 .password(passwordEncoder().encode("123"))
-                .roles(Role.ADMIN.name())
+                .authorities(Role.ADMIN.getAuthorities())
                 .build();
 
         // создаем пользователя с ролью USER
         UserDetails userAnton = User.builder()
-                .username("anton")
+                .username("user")
                 .password(passwordEncoder().encode("321"))
-                .roles(Role.USER.name())
+                .authorities(Role.USER.getAuthorities())
                 .build();
 
         return new InMemoryUserDetailsManager(admin, userAnton);
