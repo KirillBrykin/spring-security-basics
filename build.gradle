@@ -30,4 +30,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation group: 'org.postgresql', name: 'postgresql', version: versions['postgresql']
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: versions['jjwt']
+
 }
