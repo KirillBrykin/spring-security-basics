@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import ru.magnit.testspringsecurity.model.Role;
 
-
+//  @Bean - добавляем для доступности метода, без него метод не будет работать
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -27,32 +27,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // может ли он что-либо делать (заходить на конкретыне разделы, добавлять контент, удалять и тд.).
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                // защита от csrf атак отключается для примера с аутентификацией httpBasic
-                .csrf().disable()
-                // первым делом опишем авторизацию на конкретные урлы пользователей
-                .authorizeRequests()
-                // antMatchers указывает на какие урлы имеет доступ пользователь, permitAll - все пользователи,
-                // страница будет доступна так же без аутентификации
-                .antMatchers("/").permitAll()
-
-                // Далее задаём доступ на урлы только по ролям.
-                // ** - любое что идёи после /api/ должен иметь доступ с определенными ролями.
-                // antMatchers - имеет перегруженные метод и можно указать тип HttpMethod.
-                // hasAnyRole - указывает каким ролям будет доступны данные урлы
-                .antMatchers(HttpMethod.GET, API_URL).hasAnyRole(Role.ADMIN.name(), Role.USER.name())
-
-                // на POST и DELETE доступ имеет только админ
-                // hasRole - принимает одну строку а hasAnyRole строку переменной длины
-                .antMatchers(HttpMethod.POST, API_URL).hasRole(Role.ADMIN.name())
-                .antMatchers(HttpMethod.DELETE, API_URL).hasRole(Role.ADMIN.name())
-
-                // далее каждый запрос (anyRequest) по урлам описанным выше (в данном примере "/api/**") должен быть
-                // аутентифицирован (authenticated) и использовать httpBasic для входа в приложение
-                .anyRequest().authenticated().and().httpBasic();
+        super.configure(http);
     }
-
-    //  @Bean - добавляем для доступности метода, без него метод не будет работать
 
     // Переопределяем метод что бы использовать InMemory users
     // и хранить пользвоателей в приложении.
