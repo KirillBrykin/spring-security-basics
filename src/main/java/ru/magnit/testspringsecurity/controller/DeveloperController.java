@@ -1,9 +1,7 @@
 package ru.magnit.testspringsecurity.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 import ru.magnit.testspringsecurity.model.Developer;
 
 import java.util.List;
@@ -11,16 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-/**
- * По умолчанию SS добавляет страницу авторизации.
- * логин: user
- * пароль: можно увидеть при запуске приложения, например:
- * Using generated security password: 46e84b54-4b54-47be-a6fe-f687f4ef8200
- *
- * Так же по умолчанию доступен /logout
- *
- * */
-
+// Авторизация пользователей на основании прав (authorities)
+@Slf4j
 @RestController
 @RequestMapping("api/v1/developers")
 public class DeveloperController {
@@ -42,6 +32,20 @@ public class DeveloperController {
                 .filter(d -> d.getId().equals(id))
                 .findFirst()
                 .orElse(null);
+    }
+
+    // @RequestBody - позволяет принимать данные из тела запроса
+    @PostMapping
+    public Developer create(@RequestBody Developer developer) {
+        DEVELOPERS.add(developer);
+        log.info("create developer: {}, state: {}", developer, DEVELOPERS);
+        return developer;
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Long id) {
+        DEVELOPERS.removeIf(d -> d.getId().equals(id));
+        log.info("delete by id: {}, state: {}", id, DEVELOPERS);
     }
 
 }
