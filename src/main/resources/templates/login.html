@@ -8,6 +8,7 @@
 <div class="container">
     <form class="form-signin" method="post" action="/auth/login">
         <h1 class="form-signin-heading">Кастомный логин</h1>
+        <p th:if="${param.error}"> Invalid username or password.</p>
         <p>
             <label for="username" class="sr-only">Email</label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Введите email" required="" autofocus="">
