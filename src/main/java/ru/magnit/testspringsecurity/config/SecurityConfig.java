@@ -3,6 +3,7 @@ package ru.magnit.testspringsecurity.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,9 +16,15 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import ru.magnit.testspringsecurity.model.Permission;
 import ru.magnit.testspringsecurity.model.Role;
 
-// @Bean - добавляем для доступности метода, без него метод не будет работать
+/**
+ * @EnableGlobalMethodSecurity(prePostEnabled = true) - устанавливаем что глобально во всём приложении
+ * у меня security реализованно в методах (@PreAuthorize)
+ *
+ * @Bean - добавляем для доступности метода, без него метод не будет работать
+ * */
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String API_URL = "/api/**";
 
@@ -36,15 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // antMatchers указывает на какие урлы имеет доступ пользователь, permitAll - все пользователи,
                 // страница будет доступна так же без аутентификации
                 .antMatchers("/").permitAll()
-
-                // Далее задаём доступ на урлы только по полномочиям.
-                // ** - любое что идёт после /api/ должно иметь доступ с определенными полномочиями.
-                // antMatchers - имеет перегруженные метод и можно указать тип HttpMethod.
-                // hasAnyAuthority - указывает каким полномочиям будет доступны данные урлы
-                .antMatchers(HttpMethod.GET, API_URL).hasAnyAuthority(Permission.DEVELOPERS_READ.getPermission())
-                .antMatchers(HttpMethod.POST, API_URL).hasAnyAuthority(Permission.DEVELOPERS_WRITE.getPermission())
-                .antMatchers(HttpMethod.DELETE, API_URL).hasAnyAuthority(Permission.DEVELOPERS_WRITE.getPermission())
-
                 // далее каждый запрос (anyRequest) по урлам описанным выше (в данном примере "/api/**") должен быть
                 // аутентифицирован (authenticated) и использовать httpBasic для входа в приложение
                 .anyRequest()
@@ -58,21 +56,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Override
     protected UserDetailsService userDetailsService() {
-        // создаем админа с ролью ADMIN
+        // создаем админа с ролью ADMIN, передаём разрешения в authorities
         UserDetails admin = User.builder()
                 .username("admin")
                 .password(passwordEncoder().encode("123"))
                 .authorities(Role.ADMIN.getAuthorities())
                 .build();
 
-        // создаем пользователя с ролью USER
+        // создаем админа с ролью USER, передаём разрешения в authorities
         UserDetails userAnton = User.builder()
                 .username("user")
                 .password(passwordEncoder().encode("321"))
                 .authorities(Role.USER.getAuthorities())
                 .build();
 
-        return new InMemoryUserDetailsManager(admin, userAnton);
+        return new InMemoryUserDetailsManager(admin,userAnton);
     }
 
     // метод позволяет закодировать пароль с "силой" 12 пароль и получить хэш,
