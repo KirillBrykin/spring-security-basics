@@ -13,15 +13,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.magnit.testspringsecurity.model.Permission;
 import ru.magnit.testspringsecurity.model.Role;
 
 /**
  * @EnableGlobalMethodSecurity(prePostEnabled = true) - устанавливаем что глобально во всём приложении
  * у меня security реализованно в методах (@PreAuthorize)
- *
  * @Bean - добавляем для доступности метода, без него метод не будет работать
- * */
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -48,7 +48,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .httpBasic();
+                // formLogin - если доабвить только этот метод то будет использоваться страница авторизации по умолчанию.
+                .formLogin()
+                // loginPage - устанавливаем урл для отображения страницы логина и устанавливаем доступ всем иначе получим ошибку
+                .loginPage("/auth/login").permitAll()
+                // Если зашли успешно то перенаправляемся по урлу /auth/success.
+                // Но если мы перед заходом на страницу логина обращались на какой то ранее
+                // авторизованный урл то после авторизации нас перекинет именно туда а не на страницу success,
+                // SS запоминает предыдущую попытку обратиться по урлу если не прошли авторизацию и кинет после успешной авторизации
+                .defaultSuccessUrl("/auth/success")
+                // и настроим страницу logout
+                // (по умолчанию он работает по методу GET /logout, что не безопастно (написано в документации SS)
+                .and()
+                .logout()
+                // а именно по урлу "/auth/logout" и с методом POST
+                .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout", "POST"))
+                // сделать не валидным сессию
+                .invalidateHttpSession(true)
+                // очистить аутентификацию
+                .clearAuthentication(true)
+                // удаляем куки под названием JSESSIONID
+                .deleteCookies("JSESSIONID")
+                // после выхода перенаправить на страницу логина
+                .logoutSuccessUrl("/auth/login");
     }
 
     // Переопределяем метод что бы использовать InMemory users
@@ -70,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorities(Role.USER.getAuthorities())
                 .build();
 
-        return new InMemoryUserDetailsManager(admin,userAnton);
+        return new InMemoryUserDetailsManager(admin, userAnton);
     }
 
     // метод позволяет закодировать пароль с "силой" 12 пароль и получить хэш,
