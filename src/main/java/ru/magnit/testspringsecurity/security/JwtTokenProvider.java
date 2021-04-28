@@ -39,11 +39,18 @@ public class JwtTokenProvider {
     }
 
     public String createToken(String username, String role) {
+        System.out.println("JwtTokenProvider.createToken");
+
         // подобие мапы с кастомными полями
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("role", role);
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds * 1000);
+        Date validity = new Date(now.getTime() + validityInMilliseconds);
+
+
+        System.out.println(now);
+        System.out.println(validity);
+
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -57,8 +64,19 @@ public class JwtTokenProvider {
     }
 
     public boolean validateToken(String token) {
+
+        System.out.println("JwtTokenProvider.validateToken");
+        System.out.println("token = " + token);
+
         try {
             Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+
+
+            System.out.println("claimsJws");
+            System.out.println(claimsJws);
+            System.out.println(claimsJws.getBody());
+            System.out.println(claimsJws.getBody().getExpiration());
+
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtAuthenticationException("JWT token is expired or invalid", HttpStatus.UNAUTHORIZED);

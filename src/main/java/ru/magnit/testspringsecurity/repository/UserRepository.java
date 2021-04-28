@@ -1,7 +1,7 @@
 package ru.magnit.testspringsecurity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.magnit.testspringsecurity.entity.User;
+import ru.magnit.testspringsecurity.model.entity.User;
 
 import java.util.Optional;
 

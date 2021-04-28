@@ -1,4 +1,4 @@
-package ru.magnit.testspringsecurity.entity;
+package ru.magnit.testspringsecurity.model.entity;
 
 import lombok.Data;
 import ru.magnit.testspringsecurity.model.Role;
@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users_test1")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

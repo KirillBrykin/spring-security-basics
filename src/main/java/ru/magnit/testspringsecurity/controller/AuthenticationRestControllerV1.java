@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.magnit.testspringsecurity.entity.User;
+import ru.magnit.testspringsecurity.model.entity.User;
 import ru.magnit.testspringsecurity.model.AuthenticationRequestDTO;
 import ru.magnit.testspringsecurity.repository.UserRepository;
 import ru.magnit.testspringsecurity.security.JwtTokenProvider;
@@ -44,6 +44,8 @@ public class AuthenticationRestControllerV1 {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
             // получаем юзера с ролями
             User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
+            System.out.println("useruser");
+            System.out.println(user);
             // создаем токен
             String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
             Map<Object, Object> response = new HashMap<>();

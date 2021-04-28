@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.magnit.testspringsecurity.entity.User;
+import ru.magnit.testspringsecurity.model.entity.User;
 import ru.magnit.testspringsecurity.repository.UserRepository;
 
 /**

@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.magnit.testspringsecurity.entity.User;
+import ru.magnit.testspringsecurity.model.entity.User;
 import ru.magnit.testspringsecurity.model.Status;
 
 import java.util.Collection;
