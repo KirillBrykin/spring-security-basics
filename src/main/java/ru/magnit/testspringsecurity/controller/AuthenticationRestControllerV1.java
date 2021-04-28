@@ -21,7 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 
-//пролучаем запрос на аутентификацию
+// пролучаем запрос на аутентификацию
+// AuthenticationManager сконфигурируем в SecurityConfig
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthenticationRestControllerV1 {
@@ -39,8 +40,11 @@ public class AuthenticationRestControllerV1 {
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDTO request) {
         try {
+            // аутентификация с помощью UsernamePasswordAuthenticationToken по емейлу и паролю
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+            // получаем юзера с ролями
             User user = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User doesn't exists"));
+            // создаем токен
             String token = jwtTokenProvider.createToken(request.getEmail(), user.getRole().name());
             Map<Object, Object> response = new HashMap<>();
             response.put("email", request.getEmail());

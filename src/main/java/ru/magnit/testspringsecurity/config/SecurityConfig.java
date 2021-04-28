@@ -52,6 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 // защита от csrf атак отключается для примера с аутентификацией httpBasic
                 .csrf().disable()
+                // указываем что больше не используем сессии
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 // первым делом опишем авторизацию на конкретные урлы пользователей
@@ -65,6 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
+                // теперь аутентифицируем ползователей на основании класа jwtConfigurer
                 .apply(jwtConfigurer);
     }
 

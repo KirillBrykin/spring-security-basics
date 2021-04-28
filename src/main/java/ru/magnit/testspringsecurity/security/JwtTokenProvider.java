@@ -23,6 +23,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.header}")
+    // заголовок запрсов, в котором храним токен
     private String authorizationHeader;
     @Value("${jwt.expiration}")
     private long validityInMilliseconds;
@@ -31,12 +32,14 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
+    // для безопасности
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     public String createToken(String username, String role) {
+        // подобие мапы с кастомными полями
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("role", role);
         Date now = new Date();
@@ -48,6 +51,7 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 // дата уничтожения токена
                 .setExpiration(validity)
+                //алгоритм шифрования
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
@@ -61,8 +65,16 @@ public class JwtTokenProvider {
         }
     }
 
+    // аутентификация хранится в контексте
     public Authentication getAuthentication(String token) {
         UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
+
+
+        System.out.println("JwtTokenProvider.getAuthentication");
+        System.out.println(userDetails);
+        System.out.println(userDetails.getUsername());
+        System.out.println(userDetails.getPassword());
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -71,6 +83,11 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
+
+        System.out.println("JwtTokenProvider.resolveToken");
+        System.out.println("request = " + request.getHeaderNames());
+        System.out.println(request.getHeader(authorizationHeader));
+
         return request.getHeader(authorizationHeader);
     }
 
