@@ -2,8 +2,6 @@
 
 https://www.youtube.com/watch?v=7uxROJ1nduk
 
-https://github.com/KirillBrykin/test-spring-security
-
 Ветки:
 STEP1 - шаблон проекта
 STEP2 - интеграция Spring Security
